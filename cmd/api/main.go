@@ -7,6 +7,7 @@ import (
 
 	"github.com/Gabriel-A-Costa/Observability/internal/config"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func health(c *gin.Context) {
@@ -19,8 +20,13 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
+	logger := config.NewLogger(cfg.Env)
+	defer logger.Sync()
+
 	router := gin.Default()
 	router.GET("/health", health)
+
+	logger.Info("Server started", zap.String("port", cfg.Port))
 
 	router.Run(fmt.Sprintf(":%s", cfg.Port))
 }
