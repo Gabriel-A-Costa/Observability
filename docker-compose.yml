@@ -5,3 +5,24 @@ services:
       - "8081:8081"
     env_file:
       - .env
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+          ignore:
+            - tmp/
+            - .git/
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus

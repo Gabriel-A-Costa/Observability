@@ -7,6 +7,7 @@ import (
 
 	"github.com/Gabriel-A-Costa/Observability/internal/config"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
@@ -25,6 +26,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/health", health)
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	logger.Info("Server started", zap.String("port", cfg.Port))
 
