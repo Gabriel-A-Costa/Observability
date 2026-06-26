@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Gabriel-A-Costa/Observability/internal/config"
+	"github.com/Gabriel-A-Costa/Observability/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
@@ -25,6 +26,8 @@ func main() {
 	defer logger.Sync()
 
 	router := gin.Default()
+	router.Use(middleware.Metrics())
+
 	router.GET("/health", health)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
