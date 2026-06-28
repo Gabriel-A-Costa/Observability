@@ -30,6 +30,12 @@ func main() {
 
 	router.GET("/health", health)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	router.GET("/error-500", func(c *gin.Context) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "simulated error 500"})
+	})
+	router.GET("/error-400", func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "simulated error 404"})
+	})
 
 	logger.Info("Server started", zap.String("port", cfg.Port))
 

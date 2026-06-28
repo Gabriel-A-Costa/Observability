@@ -35,7 +35,8 @@
 3. Loki + Promtail
 4. OpenTelemetry + Tempo
 5. Feature real com banco de dados (PostgreSQL) — **introduzir o DB aqui, junto com a primeira feature que precisar persistir dados**
-6. Nginx — **introduzir apenas quando precisar de reverse proxy ou SSL; desnecessário em desenvolvimento local**
+6. cAdvisor — **introduzir quando quiser métricas USE de containers (CPU, memória, rede por container). Não exige mudança de código — funciona com qualquer linguagem**
+7. Nginx — **introduzir apenas quando precisar de reverse proxy ou SSL; desnecessário em desenvolvimento local**
 
 ---
 

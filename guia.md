@@ -136,7 +136,29 @@ Para o projeto de aprendizado, **faz sentido usar tudo** — justamente para ent
 - Conectar a aplicação Go ao banco
 - Observar queries com logs e métricas
 
-### 5. Nginx
+### 5. cAdvisor + USE em outros sistemas
+
+O método USE (Utilization, Saturation, Errors) mede **recursos de infraestrutura** — CPU, memória, disco, rede. Diferente do RED, ele é coletado **fora da aplicação**, sem tocar no código. Funciona com qualquer linguagem.
+
+> **Introduzir o cAdvisor aqui** — quando quiser métricas USE dos containers. Basta adicionar no `docker-compose.yml`.
+
+**Ferramentas por ambiente:**
+
+| Ambiente | Ferramenta | O que coleta |
+|---|---|---|
+| **Com Docker** | cAdvisor | CPU, memória, rede por container |
+| **Sem Docker (Linux/VM)** | Node Exporter | CPU, memória, disco, rede da máquina |
+| **Sem Docker (Windows)** | Windows Exporter | CPU, memória, disco, rede |
+| **Kubernetes** | kube-state-metrics + Node Exporter | Estado dos pods + recursos da máquina |
+| **Go runtime** | promhttp (automático) | Goroutines, memória heap, GC |
+
+- cAdvisor: https://github.com/google/cadvisor
+- Node Exporter: https://github.com/prometheus/node_exporter
+- Windows Exporter: https://github.com/prometheus-community/windows_exporter
+
+---
+
+### 6. Nginx
 > **Introduzir apenas quando o ambiente pedir** — reverse proxy, SSL termination ou load balancing. Em desenvolvimento local é desnecessário; o Gin já serve HTTP direto.
 - Adicionar Nginx no `docker-compose.yml`
 - Configurar como reverse proxy para a aplicação
