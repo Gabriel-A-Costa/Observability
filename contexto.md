@@ -30,9 +30,9 @@
 
 ## Ordem de estudo acordada
 
-1. **Base do projeto Go** ← estamos aqui
-2. Prometheus + Grafana
-3. Loki + Promtail
+1. ~~Base do projeto Go~~ ✅
+2. ~~Prometheus + Grafana~~ ✅
+3. **Loki + Alloy** ← estamos aqui
 4. OpenTelemetry + Tempo
 5. Feature real com banco de dados (PostgreSQL) — **introduzir o DB aqui, junto com a primeira feature que precisar persistir dados**
 6. cAdvisor — **introduzir quando quiser métricas USE de containers (CPU, memória, rede por container). Não exige mudança de código — funciona com qualquer linguagem**
@@ -40,17 +40,36 @@
 
 ---
 
-## Checklist — Etapa 1: Base do projeto Go
+## Checklist — Etapa 1: Base do projeto Go ✅
 
-- [ ] `go mod init` — inicializar o módulo
-- [ ] Criar estrutura de pastas (`cmd/`, `internal/`, etc.)
-- [ ] Servidor HTTP com Gin subindo na porta `8080`
-- [ ] Endpoint `/health` retornando `{ "status": "ok" }`
-- [ ] Configuração via variáveis de ambiente (`envconfig`)
-- [ ] `Dockerfile` — buildar e rodar a app em container
-- [ ] `docker-compose.yml` — orquestrar app + serviços futuros
-- [ ] `.dockerignore` — excluir arquivos desnecessários do build
-- [ ] Zap configurado no startup com log `"server started"` e campo `port`
+- [x] `go mod init` — inicializar o módulo
+- [x] Criar estrutura de pastas (`cmd/`, `internal/`, etc.)
+- [x] Servidor HTTP com Gin subindo na porta `8080`
+- [x] Endpoint `/health` retornando `{ "status": "ok" }`
+- [x] Configuração via variáveis de ambiente (`envconfig` + `godotenv`)
+- [x] `Dockerfile` — multi-stage build
+- [x] `docker-compose.yml` — orquestrar app + serviços
+- [x] `.dockerignore` — excluir arquivos desnecessários do build
+- [x] Air — hot reload local
+- [x] Zap configurado no startup com log `"server started"` e campo `port`
+
+## Checklist — Etapa 2: Prometheus + Grafana ✅
+
+- [x] Prometheus e Grafana no `docker-compose.yml`
+- [x] `prometheus.yml` — configuração de scrape
+- [x] Endpoint `/metrics` exposto na app
+- [x] Middleware de métricas HTTP (`http_requests_total`, `http_request_duration_seconds`)
+- [x] Grafana conectado ao Prometheus como datasource
+- [x] Dashboard com painéis RED (taxa, erros 5xx, latência P95)
+- [x] Dashboard com painéis USE Go (goroutines, memória heap, GC duration)
+
+## Checklist — Etapa 3: Loki + Alloy ← em andamento
+
+- [x] Loki e Alloy no `docker-compose.yml`
+- [ ] Configuração do Alloy para coletar logs
+- [ ] Zap escrevendo logs em arquivo JSON
+- [ ] Loki como datasource no Grafana
+- [ ] Visualizar logs no Grafana com LogQL
 
 ---
 
@@ -99,12 +118,15 @@ observabilidade/
 - docker-compose reference: https://docs.docker.com/compose/compose-file/
 - Multi-stage builds: https://docs.docker.com/build/building/multi-stage/
 
-### Prometheus (próxima etapa)
+### Prometheus
 - Docs oficiais: https://prometheus.io/docs/introduction/overview/
 - Client Go: https://github.com/prometheus/client_golang
+- PromQL cheat sheet: https://promlabs.com/promql-cheat-sheet/
 
-### Loki
-- Docs oficiais: https://grafana.com/docs/loki/latest/
+### Loki + Alloy ← próxima etapa
+- Loki docs: https://grafana.com/docs/loki/latest/
+- Alloy docs: https://grafana.com/docs/alloy/latest/
+- LogQL basics: https://grafana.com/docs/loki/latest/query/
 
 ### OpenTelemetry
 - Docs Go: https://opentelemetry.io/docs/languages/go/

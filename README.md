@@ -78,6 +78,21 @@ Diferente do RED, o USE é coletado **fora da aplicação** — pelo sistema ope
 
 ---
 
+## Configuração dos serviços no Docker Compose
+
+Cada serviço tem uma origem de configuração diferente. Referências para quando precisar customizar:
+
+| Serviço | Config esperada | Referência |
+|---|---|---|
+| **Prometheus** | `/etc/prometheus/prometheus.yml` — montado via volume | https://hub.docker.com/r/prom/prometheus |
+| **Loki** | `/etc/loki/local-config.yaml` — embutida na imagem (modo monolítico) | https://grafana.com/docs/loki/latest/setup/install/docker/ |
+| **Alloy** | Arquivo `.alloy` passado via argumento `run <path>` | https://grafana.com/docs/alloy/latest/get-started/run/docker/ |
+| **Grafana** | Sem config inicial — datasources e dashboards configurados pela UI | https://hub.docker.com/r/grafana/grafana |
+
+> Para qualquer nova ferramenta da Grafana Labs, procure `<nome> docker install` na doc oficial — quase sempre tem o exemplo de compose pronto.
+
+---
+
 ## Referências PromQL
 
 - [Basics](https://prometheus.io/docs/prometheus/latest/querying/basics/)

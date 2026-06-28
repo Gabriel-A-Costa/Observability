@@ -26,7 +26,7 @@ Banco de dados de logs da Grafana Labs. Diferente do Elasticsearch, ele **não i
 
 Fluxo:
 ```
-App (Zap) → Promtail/Alloy (agente coletor) → Loki (armazena) → Grafana (visualiza)
+App (Zap) → Alloy (agente coletor) → Loki (armazena) → Grafana (visualiza)
 ```
 
 - Docs: https://grafana.com/docs/loki/latest/
@@ -84,7 +84,7 @@ App (OTel SDK) → OTel Collector → Tempo (armazena) → Grafana (visualiza)
 └────────┬────────────┬────────────┬──────────┘
          │            │            │
          ▼            ▼            ▼
-      Promtail    /metrics      OTel Collector
+       Alloy      /metrics      OTel Collector
       (agente)   endpoint
          │            │            │
          ▼            ▼            ▼
@@ -120,8 +120,27 @@ Para o projeto de aprendizado, **faz sentido usar tudo** — justamente para ent
 - Exponha `/metrics` em Go com `prometheus/client_golang`
 - Monte um dashboard básico no Grafana
 
-### 2. Loki + Promtail
-- Configure coleta de logs
+### 2. Loki + Alloy
+
+#### Modos de implantação do Loki
+
+O Loki tem três modos de deploy. A escolha impacta complexidade e escala:
+
+| Modo | Como funciona | Quando usar |
+|---|---|---|
+| **Monolítico** | Todos os componentes num processo só | Aprendizado, projetos pequenos |
+| **Simples escalável** | Separa leitura e escrita em dois processos | Médio volume, uma instância por papel |
+| **Microsserviços** | Cada componente roda separado | Alto volume, escala independente |
+
+> **Nesse projeto usamos o modo Monolítico** — um container, zero config extra. É suficiente para aprendizado e visualização local.
+
+Os outros dois modos serão explorados como exemplos comparativos após dominar o monolítico.
+
+- Docs oficiais dos modos: https://grafana.com/docs/loki/latest/get-started/deployment-modes/
+
+#### O que implementar
+
+- Configure coleta de logs com Alloy
 - Aprenda LogQL (linguagem de query do Loki)
 - Visualize logs no Grafana
 
