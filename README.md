@@ -56,7 +56,7 @@ go_goroutines
 # GO - Memória heap (Stat - Unit[bytes-IEC])
 go_memstats_alloc_bytes
 
-#GO - Garbage Collector - Duração média de cada pausa do GC (Time series)
+# GO - Garbage Collector - Duração média de cada pausa do GC (Time series)
 rate(go_gc_duration_seconds_sum[5m]) / rate(go_gc_duration_seconds_count[5m])
 ```
 
@@ -77,6 +77,41 @@ Diferente do RED, o USE é coletado **fora da aplicação** — pelo sistema ope
 > Nenhuma dessas ferramentas exige mudança no código da aplicação — elas coletam métricas de infraestrutura externamente. Funcionam com qualquer linguagem (PHP, Node, Delphi, Go, etc.)
 
 ---
+
+## Loki + Alloy
+
+O projeto ja possui as configuracões do alloy definidas, para verificar se o mesmo esta rodando corretamente, execulte o comando:
+
+```bash
+docker compose logs alloy
+```
+
+### Pontos-chaves do log
+
+```
+# finished node evaluation ... local.file_match.app_logs — o Alloy encontrou e avaliou o componente de busca de arquivos
+
+# finished node evaluation ... loki.source.file.app_logs — o componente de leitura foi avaliado
+
+# finished node evaluation ... loki.write.local — o componente de envio para o Loki foi avaliado
+
+# {^_^} Alloy is running — stack completa de pé
+
+# start tailing file ... path=/logs/app.log — o Alloy está monitorando o arquivo de log em tempo real
+```
+
+### Queries PromQL utilizadas
+
+```promql
+# Explore - Filtro de all logs
+{filename="/logs/app.log"}
+
+# Explore - Filtro de logs de error
+{filename="/logs/app.log"} |= "error"
+
+# Explore - Filtro por nível de log
+{filename="/logs/app.log"} | json | level="info"
+```
 
 ## Configuração dos serviços no Docker Compose
 

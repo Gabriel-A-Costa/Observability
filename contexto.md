@@ -32,8 +32,8 @@
 
 1. ~~Base do projeto Go~~ ✅
 2. ~~Prometheus + Grafana~~ ✅
-3. **Loki + Alloy** ← estamos aqui
-4. OpenTelemetry + Tempo
+3. ~~Loki + Alloy~~ ✅
+4. **OpenTelemetry + Tempo** ← estamos aqui
 5. Feature real com banco de dados (PostgreSQL) — **introduzir o DB aqui, junto com a primeira feature que precisar persistir dados**
 6. cAdvisor — **introduzir quando quiser métricas USE de containers (CPU, memória, rede por container). Não exige mudança de código — funciona com qualquer linguagem**
 7. Nginx — **introduzir apenas quando precisar de reverse proxy ou SSL; desnecessário em desenvolvimento local**
@@ -66,10 +66,10 @@
 ## Checklist — Etapa 3: Loki + Alloy ← em andamento
 
 - [x] Loki e Alloy no `docker-compose.yml`
-- [ ] Configuração do Alloy para coletar logs
-- [ ] Zap escrevendo logs em arquivo JSON
-- [ ] Loki como datasource no Grafana
-- [ ] Visualizar logs no Grafana com LogQL
+- [x] Configuração do Alloy para coletar logs
+- [x] Zap escrevendo logs em arquivo JSON
+- [x] Loki como datasource no Grafana
+- [x] Visualizar logs no Grafana com LogQL
 
 ---
 
