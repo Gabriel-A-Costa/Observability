@@ -26,7 +26,11 @@ func main() {
 	defer logger.Sync()
 
 	router := gin.Default()
+
+	// Middleware para geração de metricas no prometheus
 	router.Use(middleware.Metrics())
+	// Midlleware para geração de logs no loki
+	router.Use(middleware.Logger(logger))
 
 	router.GET("/health", health)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))

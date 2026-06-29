@@ -37,6 +37,7 @@
 5. Feature real com banco de dados (PostgreSQL) — **introduzir o DB aqui, junto com a primeira feature que precisar persistir dados**
 6. cAdvisor — **introduzir quando quiser métricas USE de containers (CPU, memória, rede por container). Não exige mudança de código — funciona com qualquer linguagem**
 7. Nginx — **introduzir apenas quando precisar de reverse proxy ou SSL; desnecessário em desenvolvimento local**
+8. **Projeto real** — após dominar toda a base acima, recriar a aplicação do zero como um CRUD completo, aplicando boas práticas de projetos grandes: estrutura de pastas madura, tratamento de erros, logs ricos com contexto de negócio, métricas de domínio, traces em operações críticas, e tudo que for identificado como relevante ao longo do aprendizado
 
 ---
 

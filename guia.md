@@ -184,6 +184,22 @@ O método USE (Utilization, Saturation, Errors) mede **recursos de infraestrutur
 
 ---
 
+### 7. Projeto real — CRUD completo
+
+> **Fazer apenas após dominar toda a base acima.** O objetivo é recriar a aplicação do zero aplicando tudo que foi aprendido, mais o que for identificado como relevante ao longo do caminho.
+
+O que se espera nessa etapa:
+- Estrutura de pastas madura para projetos Go reais
+- CRUD completo com PostgreSQL
+- Tratamento de erros consistente e padronizado
+- Logs ricos com contexto de negócio (`user_id`, `order_id`, etc.)
+- Métricas de domínio além das de infraestrutura
+- Traces em operações críticas (queries, chamadas externas)
+- Correlação logs → traces via `trace_id`
+- Boas práticas que se esperam em projetos grandes
+
+---
+
 ## Ordem de desenvolvimento num projeto real
 
 Observabilidade não é uma feature adicionada no final. É **infraestrutura transversal** — como tratamento de erros ou configuração.
