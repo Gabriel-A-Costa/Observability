@@ -1,5 +1,3 @@
-# Configs para rodar projeto local
-
 services:
   api:
     build: .
@@ -48,34 +46,3 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
-
-# Configs para utilizar loki e prometheus da topsoft
-
-# services:
-#   api:
-#     build: .
-#     ports:
-#       - "8081:8081"
-#     env_file:
-#       - .env
-#     volumes:
-#       - ./logs:/app/logs
-#     develop:
-#       watch:
-#         - action: rebuild
-#           path: .
-#           ignore:
-#             - tmp/
-#             - .git/
-#             - logs/
-
-#   alloy:
-#     image: grafana/alloy:latest
-#     ports:
-#       - "12345:12345"
-#     env_file:
-#       - .env
-#     volumes:
-#       - ./alloy/config.alloy:/etc/alloy/config.alloy
-#       - ./logs:/logs
-#     command: run /etc/alloy/config.alloy

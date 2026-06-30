@@ -1,0 +1,26 @@
+local.file_match "app_logs" {
+  path_targets = [{"__path__" = "/logs/*.log"}]
+}
+
+loki.source.file "app_logs" {
+  targets    = local.file_match.app_logs.targets
+  forward_to = [loki.write.remote.receiver]
+}
+
+loki.write "remote" {
+  endpoint {
+    url = "http://" + env("LOKI_HOST") + "/loki/api/v1/push"
+  }
+}
+
+prometheus.scrape "api_metrics" {
+  targets    = [{"__address__" = "api:8081"}]
+  forward_to = [prometheus.remote_write.remote.receiver]
+}
+
+prometheus.remote_write "remote" {
+  endpoint {
+    url            = "http://" + env("PROMETHEUS_HOST") + "/api/v1/write"
+    remote_timeout = "60s"
+  }
+}

@@ -2,12 +2,6 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  # local
   - job_name: "api"
-  # topsoft
-  # - job_name: "prometheus"
     static_configs:
-      #local
       - targets: ["api:8081"]
-      # topsoft
-      # - targets: ["localhost:9090"]
