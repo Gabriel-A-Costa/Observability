@@ -141,8 +141,50 @@ Os outros dois modos serão explorados como exemplos comparativos após dominar 
 #### O que implementar
 
 - Configure coleta de logs com Alloy
+- Middleware de logging HTTP com nível baseado no status code (2xx→Info, 4xx→Warn, 5xx→Error)
 - Aprenda LogQL (linguagem de query do Loki)
-- Visualize logs no Grafana
+- Visualize logs no Grafana — painéis: volume, erros, warnings, distribuição por nível
+
+#### Config remota — stack centralizada
+
+Em ambientes reais, o Prometheus, Loki e Grafana rodam num servidor separado. A aplicação envia os dados para lá em vez de subir sua própria instância local.
+
+**Arquitetura:**
+
+```
+[Servidor]
+  prometheus + loki + grafana   ← docker-compose.server.yml
+
+[App (qualquer máquina)]
+  api + alloy                   ← docker-compose.remote.yml
+  alloy envia logs → loki remoto
+  alloy faz scrape → prometheus remoto (remote_write)
+```
+
+**O que muda em relação ao local:**
+
+| Componente | Local | Remoto |
+|---|---|---|
+| `alloy/config.alloy` | envia para `http://loki:3100` | envia para `env("LOKI_HOST")` |
+| Prometheus scrape | Prometheus puxa da app | Alloy puxa e faz remote_write |
+| docker-compose | sobe tudo junto | sobe só api + alloy |
+
+**Requisito no Prometheus do servidor:** habilitar o receiver de remote_write:
+
+```yaml
+command:
+  - "--web.enable-remote-write-receiver"
+```
+
+**Variáveis de ambiente necessárias (`.env`):**
+
+```env
+PROMETHEUS_HOST=<endereço-do-servidor>:9090
+LOKI_HOST=<endereço-do-servidor>:3100
+```
+
+- Alloy remote_write docs: https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.remote_write/
+- Prometheus remote_write receiver: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
 
 ### 3. OpenTelemetry + Tempo
 - Instrumente uma rota HTTP com trace
@@ -369,13 +411,36 @@ Você já conhece o Zap, então aqui é só definir **como** ele vai ser configu
 
 ### O que fazer agora
 
-- [ ] Rodar o `go mod init`
-- [ ] Criar as pastas conforme a estrutura acima
-- [ ] Criar o `cmd/api/main.go` com o servidor Gin subindo na porta `8080`
-- [ ] Adicionar a rota `/health` retornando `{ "status": "ok" }`
-- [ ] Configurar o envconfig com `.env`
-- [ ] Criar o `Dockerfile` com multi-stage build
-- [ ] Criar o `docker-compose.yml` e o `.dockerignore`
-- [ ] Configurar o Zap no startup e logar `"server started"` com o campo `port`
+**Etapa 1 — Base Go** ✅
+- [x] `go mod init`
+- [x] Estrutura de pastas (`cmd/`, `internal/middleware/`, `internal/config/`)
+- [x] Servidor Gin na porta `8081`
+- [x] Endpoint `/health`
+- [x] envconfig + godotenv
+- [x] Dockerfile multi-stage
+- [x] `docker-compose.yml` + `.dockerignore`
+- [x] Air — hot reload local
+- [x] Zap configurado no startup
 
-Quando o container estiver rodando e o `/health` respondendo, a próxima etapa é adicionar o **Prometheus**.
+**Etapa 2 — Prometheus + Grafana** ✅
+- [x] Prometheus e Grafana no `docker-compose.yml`
+- [x] `prometheus.yml` — scrape da API
+- [x] Endpoint `/metrics`
+- [x] Middleware de métricas HTTP
+- [x] Dashboard RED + USE no Grafana
+
+**Etapa 3 — Loki + Alloy** ✅
+- [x] Loki e Alloy no `docker-compose.yml`
+- [x] `alloy/config.alloy` — coleta logs e envia ao Loki local
+- [x] Zap gravando em arquivo JSON via `lumberjack` + `zapcore.NewTee`
+- [x] Middleware de logging HTTP com níveis por status (2xx→Info, 4xx→Warn, 5xx→Error)
+- [x] Loki como datasource no Grafana
+- [x] Dashboard de logs: volume, erros, warnings, distribuição por nível
+- [x] Config remota: `alloy/config.remote.alloy` + `docker-compose.remote.yml` + `docker-compose.server.yml`
+
+**Etapa 4 — OpenTelemetry + Tempo** ← próxima
+- [ ] Tempo no `docker-compose.yml`
+- [ ] Instrumentar uma rota HTTP com trace via SDK do OpenTelemetry
+- [ ] Ver os spans no Grafana via Tempo
+- [ ] Correlacionar log → trace via `trace_id`
+- [ ] Config remota do Tempo

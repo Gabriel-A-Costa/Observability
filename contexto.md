@@ -64,13 +64,15 @@
 - [x] Dashboard com painéis RED (taxa, erros 5xx, latência P95)
 - [x] Dashboard com painéis USE Go (goroutines, memória heap, GC duration)
 
-## Checklist — Etapa 3: Loki + Alloy ← em andamento
+## Checklist — Etapa 3: Loki + Alloy ✅
 
 - [x] Loki e Alloy no `docker-compose.yml`
-- [x] Configuração do Alloy para coletar logs
-- [x] Zap escrevendo logs em arquivo JSON
+- [x] Configuração do Alloy para coletar logs (`alloy/config.alloy`)
+- [x] Zap escrevendo logs em arquivo JSON (`lumberjack` + `zapcore.NewTee`)
+- [x] Middleware de logging HTTP com níveis por status code (2xx→Info, 4xx→Warn, 5xx→Error)
 - [x] Loki como datasource no Grafana
-- [x] Visualizar logs no Grafana com LogQL
+- [x] Dashboard de logs: volume, erros, warnings, distribuição por nível (LogQL)
+- [x] Config remota: `alloy/config.remote.alloy` + `docker-compose.remote.yml` + `docker-compose.server.yml`
 
 ---
 
@@ -80,11 +82,23 @@
 observabilidade/
 ├── cmd/
 │   └── api/
-│       └── main.go          ← entrypoint
+│       └── main.go                    ← entrypoint
 ├── internal/
-│   ├── handler/             ← handlers HTTP
-│   ├── service/             ← lógica de negócio
-│   └── config/              ← leitura de env vars
+│   ├── middleware/
+│   │   ├── metrics.go                 ← middleware Prometheus
+│   │   └── logger.go                  ← middleware Zap (níveis por status)
+│   └── config/
+│       ├── config.go                  ← leitura de env vars
+│       └── logger.go                  ← setup do Zap (terminal + arquivo)
+├── alloy/
+│   ├── config.alloy                   ← config Alloy local
+│   └── config.remote.alloy            ← config Alloy remoto
+├── logs/
+│   └── .gitkeep
+├── docker-compose.yml                 ← ambiente local completo
+├── docker-compose.remote.yml          ← app + alloy apontando para servidor remoto
+├── docker-compose.server.yml          ← prometheus + loki + grafana (servidor)
+├── prometheus.yml
 ├── go.mod
 └── go.sum
 ```
@@ -102,6 +116,9 @@ observabilidade/
 | Logger prod | modo `production` | Output JSON para integrar com Loki |
 | Container | **Docker** | Isola a app e garante paridade entre local e produção |
 | Orquestração local | **docker-compose** | Sobe app + Prometheus + Grafana + Loki + Tempo juntos |
+| Orquestração remota | **docker-compose.remote.yml** | Sobe só app + Alloy; observabilidade fica no servidor |
+| Rotação de logs | **lumberjack** | Zap não tem rotação nativa; lumberjack gerencia tamanho e backups |
+| Middleware de log | **níveis por status** | 2xx→Info, 4xx→Warn, 5xx→Error — padrão de mercado |
 
 ---
 
@@ -124,7 +141,7 @@ observabilidade/
 - Client Go: https://github.com/prometheus/client_golang
 - PromQL cheat sheet: https://promlabs.com/promql-cheat-sheet/
 
-### Loki + Alloy ← próxima etapa
+### Loki + Alloy
 - Loki docs: https://grafana.com/docs/loki/latest/
 - Alloy docs: https://grafana.com/docs/alloy/latest/
 - LogQL basics: https://grafana.com/docs/loki/latest/query/
@@ -137,6 +154,7 @@ observabilidade/
 ## Contexto do usuário
 
 - Tem familiaridade com **Zap**
-- Nunca usou **Loki, Prometheus, Grafana, OpenTelemetry ou Tempo**
+- Já usou **Loki, Prometheus e Grafana** neste projeto — conhece o fluxo básico
+- Nunca usou **OpenTelemetry ou Tempo**
 - Quer aprender o ecossistema de observabilidade do zero, de forma estruturada
 - Prefere entender o conceito antes de escrever código

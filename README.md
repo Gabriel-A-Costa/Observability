@@ -1,14 +1,16 @@
 # Observability
 
-Projeto de observabilidade utilizando **Zap**, **Loki**, **Prometheus**, **OpenTelemetry**, **Tempo** e **Grafana**.
+Projeto de observabilidade utilizando **Zap**, **Loki**, **Alloy**, **Prometheus**, **OpenTelemetry**, **Tempo** e **Grafana**.
 
 ---
 
-## Como executar
+## Ambientes
 
-```bash
-docker compose watch
-```
+| Ambiente | Comando | O que sobe |
+|---|---|---|
+| **Local** | `docker compose watch` | app + prometheus + loki + alloy + grafana |
+| **Remoto** | `docker compose -f docker-compose.remote.yml watch` | app + alloy (observabilidade no servidor) |
+| **Servidor** | `docker compose -f docker-compose.server.yml up -d` | prometheus + loki + grafana |
 
 Em outro terminal, acompanhe os logs da API:
 
@@ -80,47 +82,53 @@ Diferente do RED, o USE é coletado **fora da aplicação** — pelo sistema ope
 
 ## Loki + Alloy
 
-O projeto ja possui as configuracões do alloy definidas, para verificar se o mesmo esta rodando corretamente, execulte o comando:
+O middleware de logging registra cada requisição HTTP com nível baseado no status code:
+
+| Status | Nível |
+|---|---|
+| 2xx | `info` |
+| 4xx | `warn` |
+| 5xx | `error` |
+
+Para verificar se o Alloy está rodando corretamente:
 
 ```bash
 docker compose logs alloy
 ```
 
-### Pontos-chaves do log
+**Pontos-chave do log:**
 
 ```
-# finished node evaluation ... local.file_match.app_logs — o Alloy encontrou e avaliou o componente de busca de arquivos
-
-# finished node evaluation ... loki.source.file.app_logs — o componente de leitura foi avaliado
-
-# finished node evaluation ... loki.write.local — o componente de envio para o Loki foi avaliado
-
-# {^_^} Alloy is running — stack completa de pé
-
-# start tailing file ... path=/logs/app.log — o Alloy está monitorando o arquivo de log em tempo real
+finished node evaluation ... local.file_match.app_logs  → encontrou os arquivos de log
+finished node evaluation ... loki.source.file.app_logs  → componente de leitura avaliado
+finished node evaluation ... loki.write.local           → envio para o Loki configurado
+{^_^} Alloy is running                                  → stack completa de pé
+start tailing file ... path=/logs/app.log               → monitorando o arquivo em tempo real
 ```
 
-### Queries PromQL utilizadas
+### Queries LogQL utilizadas
 
-```promql
-# Explore - Filtro de all logs
-{filename="/logs/app.log"}
+```logql
+# Explore — todos os logs
+{filename="/logs/app.log"} | json
 
-# Explore - Filtro de logs de error
-{filename="/logs/app.log"} |= "error"
+# Explore — filtrar por nível
+{filename="/logs/app.log"} | json | level="error"
 
-# Explore - Filtro por nível de log
-{filename="/logs/app.log"} | detected_level="info"
+# Dashboard — volume de logs por minuto (Time series)
+sum(rate({filename="/logs/app.log"}[1m]))
 
-# Dashboard - Volume de logs por minuto/tempo (Time series)
-rate({filename="/logs/app.log"}[1])
+# Dashboard — erros 5xx ao longo do tempo (Time series)
+sum(rate({filename="/logs/app.log"} | json | level="error" [5m]))
 
-# Dashboard - Erros ao longo do tempo (Time series)
-rate({filename="/logs/app.log"} | detected_level="error" [5m])
+# Dashboard — warnings 4xx ao longo do tempo (Time series)
+sum(rate({filename="/logs/app.log"} | json | level="warn" [5m]))
 
-# Dashboard - Distribuição por nível ao longo do tempo (Time series)
-sum by(detected_level) (rate({filename="/logs/app.log"} [5m]))
+# Dashboard — distribuição por nível ao longo do tempo (Time series)
+sum by(level) (rate({filename="/logs/app.log"} | json [5m]))
 ```
+
+---
 
 ## Configuração dos serviços no Docker Compose
 
