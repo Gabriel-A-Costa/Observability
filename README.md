@@ -110,16 +110,16 @@ docker compose logs alloy
 {filename="/logs/app.log"} |= "error"
 
 # Explore - Filtro por nível de log
-{filename="/logs/app.log"} | json | level="info"
+{filename="/logs/app.log"} | detected_level="info"
 
 # Dashboard - Volume de logs por minuto/tempo (Time series)
 rate({filename="/logs/app.log"}[1])
 
 # Dashboard - Erros ao longo do tempo (Time series)
-rate({filename="/logs/app.log"} |= "error" [5m])
+rate({filename="/logs/app.log"} | detected_level="error" [5m])
 
 # Dashboard - Distribuição por nível ao longo do tempo (Time series)
-sum by(level) (rate({filename="/logs/app.log"} | json [5m]))
+sum by(detected_level) (rate({filename="/logs/app.log"} [5m]))
 ```
 
 ## Configuração dos serviços no Docker Compose
